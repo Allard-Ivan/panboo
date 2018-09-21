@@ -115,15 +115,15 @@ $.fn.cycle = function(options) {
     });
 }
 
-function go(els, opts, fwd) {
+function go(els, opts, manual, fwd) {
     if (opts.busy) {
         return;
     }
     var p = els[0].parentNode, curr = els[opts.currSlide], next = els[opts.nextSlide];
-    if (p.cycleTimeout === 0) {
+    if (p.cycleTimeout === 0 && !manual) {
         return;
     }
-    if (!p.cyclePause) {
+    if (manual || !p.cyclePause) {
         if (opts.before.length) {
             $.each(opts.before, function (i, o) { o.apply(next, [curr, next, opts, fwd]); });
         }
@@ -156,17 +156,74 @@ function advance(els, opts, val) {
         clearTimeout(timeout);
         p.cycleTimeout = 0;
     }
-    opts.nextSlide = 
+    opts.nextSlide = opts.currSlide + val;
+    if (opts.nextSlide < 0) {
+        opts.nextSlide = els.length - 1;
+    } else if (opts.nextSlide >= els.length) {
+        opts.nextSlide=  0;
+    }
+    go(els, opts, 1, val>=0);
+    return false;
+}
+
+$.fn.cycle.custom = function(curr, next, opts, cb) {
+    var $l = $(curr), $n = $(next);
+    $n.css(opts.cssBefore);
+    console.log(opts.cssBefore);
+    var fn = function() {$n.animate(opts.animIn, opts.speedIn, opts.easeIn, cb);};
+    console.log(opts.animOut);
+    $l.animate(opts.animOut, opts.speedOut, opts.easeOut, function() {
+        $l.css(opts.cssAfter);
+        console.log(opts.cssAfter);
+        if (!opts.sync) {
+            fn();
+        }
+    });
+    if (opts.sync) {
+        fn();
+    }
 }
 
 $.fn.cycle.transitions = {
     fade: function ($cont, $slides, opts) {
-        $slides.not('eq(0)').hide();
+        $slides.not(':eq(0)').hide();
         opts.cssBefore = { opacity: 0, display: 'block' };
         opts.cssAfter = { display: 'none' };
         opts.animOut = { opacity: 0 };
         opts.animIn = { opacity: 1 };
+    },
+    fadeout: function($cont, $slides, opts) {
+        opts.before.push(function(curr,next,opts,fwd) {
+            $(curr).css('zIndex',opts.slideCount + (fwd === true ? 1 : 0));
+            $(next).css('zIndex',opts.slideCount + (fwd === true ? 0 : 1));
+        });
+        $slides.not(':eq(0)').hide();
+        opts.cssBefore = { opacity: 1, display: 'block', zIndex: 1 };
+        opts.cssAfter  = { display: 'none', zIndex: 0 };
+        opts.animOut = { opacity: 0 };
+        opts.animIn = { opacity: 1 };
     }
+};
+
+$.fn.cycle.defaults = {
+    animIn:        {},
+    animOut:       {},
+    fx:           'fadeout',
+    after:         null,
+    before:        null,
+    cssBefore:     {},
+    cssAfter:      {},
+    delay:         0,
+    fit:           0,
+    height:       'auto',
+    metaAttr:     'cycle',
+    next:          null,
+    pause:         false,
+    prev:          null,
+    speed:         1000,
+    slideExpr:     null,
+    sync:          true,
+    timeout:       1000
 };
 
 })(jQuery);
