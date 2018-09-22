@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="./jquery.s1.js"></script>
+    <script src="./jquery.panboo.js"></script>
     <style rel="stylesheet" type="text/css">
     .pics {  
         height:  232px;  
@@ -34,32 +34,32 @@
     </div> 
     <script>
         $('#s1').children().each(function(index, elem) {
-            this.setAttribute('slideshow', JSON.stringify({
+            this.setAttribute('panboo', JSON.stringify({
             "fxIn":"fade",
             "speedIn":1000,
-            "fxOut":"blindX",
+            "fxOut":"blindZ",
             "speedOut":1000,
             "timeout":2000
             }));
         });
 
-document.getElementById('bar').setAttribute('slideshow',JSON.stringify({
-            "fxIn":"blindX",
+document.getElementById('bar').setAttribute('panboo',JSON.stringify({
+            "fxIn":"growY",
             "speedIn":1000,
-            "fxOut":"fade",
+            "fxOut":"growX",
             "speedOut":500,
             "timeout":1000
             }));
 
 
-        // document.getElementById('foo').setAttribute('slideshow',JSON.stringify({
+        // document.getElementById('foo').setAttribute('panboo',JSON.stringify({
         //     "fxIn":"blindX",
         //     "speedIn":1000,
         //     "fxOut":"fade",
         //     "speedOut":500,
         //     "timeout":1000
         //     }));
-        $('#s1').cycle();
+        $('#s1').panboo();
     </script>
 </body>
 </html>
