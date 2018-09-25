@@ -30,25 +30,25 @@
     <div id="s1" class="pics"> 
         <img id="bar" src="http://malsup.github.com/images/beach1.jpg" width="200" height="200" /> 
         <img id="foo" src="http://malsup.github.com/images/beach2.jpg" width="200" height="200" /> 
-        <img src="http://malsup.github.com/images/beach3.jpg" width="200" height="200" /> 
+        <!-- <img src="http://malsup.github.com/images/beach3.jpg" width="200" height="200" />  -->
     </div> 
     <script>
         $('#s1').children().each(function(index, elem) {
-            this.setAttribute('panboo', JSON.stringify({
-            "fxIn":"fade",
+            this.setAttribute('data-panboo', JSON.stringify({
+            "fxIn":"blindZ",
             "speedIn":1000,
             "fxOut":"blindZ",
             "speedOut":1000,
-            "timeout":2000
+            "timeout":3000
             }));
         });
 
-document.getElementById('bar').setAttribute('panboo',JSON.stringify({
+document.getElementById('bar').setAttribute('data-panboo',JSON.stringify({
             "fxIn":"growY",
             "speedIn":1000,
-            "fxOut":"growX",
-            "speedOut":500,
-            "timeout":1000
+            "fxOut":"growY",
+            "speedOut":1000,
+            "timeout":3000
             }));
 
 

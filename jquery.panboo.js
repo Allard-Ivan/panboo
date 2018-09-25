@@ -1,7 +1,7 @@
 ;(function($) {
     "use strict";
 
-var code = 'panboo';
+var code = 'data-panboo';
 
 $.fn.panboo = function(options) {
     return this.each(function() {
@@ -20,17 +20,18 @@ $.fn.panboo = function(options) {
             console.log('too few');
             return;
         }
-
+        
+        var config = {};
         var optsArr = [];
         $slides.each(function() {
             var attrValue = this.getAttribute(code);
-            if (!attrValue) {
-                console.log('less slideshow');
-                return;
+            if (attrValue) {
+                attrValue = JSON.parse(attrValue);
             }
-            this.panbooW = this.width;
-            this.panbooH = this.height;
-            var opts = $.extend({}, $.fn.panboo.defaults, JSON.parse(attrValue));
+            var $el = $(this);
+            this.panbooW = $el.width();
+            this.panbooH = $el.height();
+            var opts = $.extend({}, $.fn.panboo.defaults, attrValue);
             opts.before = [];
             opts.after = [];
             opts.after.unshift(function() {opts.busy = 0;});
@@ -75,7 +76,6 @@ $.fn.panboo = function(options) {
             }
         });
 
-        var config = {};
         config.slideCount = els.length;
         config.currSlide = first;
         config.nextSlide = 1;
@@ -89,6 +89,9 @@ $.fn.panboo = function(options) {
 };
 
 function go(els, config, optsArr) {
+    if (config.busy) {
+        return;
+    }
     var p = els[0].parentNode, curr = els[config.currSlide], next = els[config.nextSlide];
     if (p.panbooTimeout === 0) {
         return;
@@ -99,13 +102,15 @@ function go(els, config, optsArr) {
 
     var after = function() {
         // $.each(config.after, function(i, o) {o.apply(next, [curr, next, config, fwd]);});
-        config.timeout = optsArr[config.nextSlide].timeout;
+        config.timeout = optsArr[config.currSlide].timeout;
+        $.each(optsArr[config.currSlide].after, function(i, o) {config.busy = 0;});
         if (config.timeout) {
             p.panbooTimeout = setTimeout(function() {go(els, config, optsArr);}, config.timeout);
         }
     };
 
     if (config.nextSlide !== config.currSlide) {
+        config.busy = 1;
         $.fn.panboo.custom(curr, next, config, after, optsArr);
     }
     var roll = (config.nextSlide + 1) === els.length;
@@ -205,6 +210,7 @@ $.fn.panboo.transitions = {
                 opts.animOut.height = 0;
                 opts.cssAfter.top = 0;
                 opts.cssAfter.height = this.panbooH;
+                console.log('panbooH:' + this.panbooH);
             });
         }
         result = {
@@ -213,7 +219,7 @@ $.fn.panboo.transitions = {
         };
         return result;
     }
-}
+};
 
 $.fn.panboo.commonSet = function(opts) {
     opts.cssBefore.display = 'block';
